@@ -5,21 +5,18 @@ from fuzzywuzzy import process
 import warnings 
 warnings.filterwarnings('ignore')
 
-
-
 ################################################################################
 #         CLI BOT section                                                      #
 ################################################################################
-
 exit_command = ["good bye", "close", "exit"]
 
 
 def format_phone_number(func):
    def inner(phone):
-      result=func(phone)
+      result = func(phone)
       if len(result) == 12:
-          result='+'+result
-      else: result='+38'+result    
+          result = '+'+result
+      else: result = '+38'+result
       return result
    return inner
             
@@ -36,8 +33,10 @@ def sanitize_phone_number(phone):
     )
     return new_phone
 
+
 def hello_(data):
     return "How can I help You?"
+
 
 def add_phone(name):
     while True:
@@ -47,34 +46,34 @@ def add_phone(name):
         if phone not in [ph.value for ph in a.data[name].phones]:
             try:
                a.data[name].add_phone(Phone(phone))
-               print ("Phone number succesfully added")
+               a.viewer("Phone number successfully added")
                return 1
             except:
-               print("incorrect phone format. Try again or type 'Exit'")
+               a.viewer("Incorrect phone format. Try again or type 'Exit'")
                continue
         else:
-            print("This number already belonged to contact "+name+", please try again")
+            a.viewer("This number already belonged to contact "+name+", please try again")
+
 
 def add_email(name):
     while True:
-        print("Input email for the contact "+name)
+        a.viewer("Input email for the contact "+name)
         email = input()
         if email == 'exit':
             return 0 
         else:
             try:
                 a.data[name].add_email(Email(email))
-                print ("Email succesfully added")
+                a.viewer("Email successfully added")
                 return 1
             except:
-                print("incorrect email format. Try again or type 'Exit'")
+                a.viewer("incorrect email format. Try again or type 'Exit'")
                 continue
             
-        
 
 def add_address(name):
     address_dict = {}
-    print("Input address for the contact "+name)
+    a.viewer("Input address for the contact "+name)
     address_dict["country"] = input("Input country: ")
     address_dict["zip"] = input("Input ZIP code: ")
     address_dict["region"] = input("Input region: ")
@@ -83,17 +82,17 @@ def add_address(name):
     address_dict["building"] = input("Input building: ")
     address_dict["apartment"] = input("Input apartment: ")
     a.data[name].add_address(Address(address_dict))
-    print ("Address succesfully added")
+    a.viewer("Address successfully added")
             
 
 def add_birthday(name):
     birthday = choose_date()
     if birthday == 'exit':
-        print("Operation canselled")
+        a.viewer("Operation cancelled")
     else:
         b=Birthday(birthday)
         a.data[name].add_birthday(b)
-        print("Birthday setted successfully")
+        a.viewer("Birthday set successfully")
     return "How can I help you?"
             
 
@@ -101,50 +100,50 @@ def add_birthday(name):
  
 def add_contact(data):
     while True:
-        print("Input the name of a contact")
+        a.viewer("Input the name of a contact")
         name = input()
         if name not in a.data.keys():
             r = Record(name)
             a.add_record(r)
             break
         else:
-            print("Contact already exists. Try again")
+            a.viewer("Contact already exists. Try again")
     while True:
-        print("Type 'P' to add phone, 'O' skip to other details")
+        a.viewer("Type 'P' to add phone, 'O' skip to other details")
         choose = input().lower()
-        if choose =='p':
+        if choose == 'p':
             add_phone(name)
         if choose == 'o':
-            print("OK, let's go ahead")
+            a.viewer("OK, let's go ahead")
             break
     while True:
-        print("Type 'E to enter e-mail, 'O' skip to other details")
+        a.viewer("Type 'E to enter e-mail, 'O' skip to other details")
         choose = input().lower()
-        if choose =='e':
+        if choose == 'e':
             add_email(name)
             break
         if choose == 'o':
-            print("OK, let's go ahead")
+            a.viewer("OK, let's go ahead")
             break
     while True:
-        print("Type 'A to enter address,  'O' skip to other details")
+        a.viewer("Type 'A to enter address, 'O' skip to other details")
         choose = input().lower()
-        if choose =='a':
+        if choose == 'a':
             add_address(name)
             break
         if choose == 'o':
-            print("OK, let's go ahead")
+            a.viewer("OK, let's go ahead")
             break
     while True:
-        print("Type 'B' to enter birthday,'F' to finish")
+        a.viewer("Type 'B' to enter birthday,'F' to finish")
         choose = input().lower()
-        if choose =='b':
+        if choose == 'b':
             add_birthday(name)
             break
         if choose == 'f':
             break
-    print("New contact details:")
-    print(a.data[name])
+    a.viewer("New contact details:")
+    a.viewer(a.data[name])
     return "How can I help you?" 
 
 
@@ -153,115 +152,117 @@ def add_contact(data):
 def edit_contact(data):
     name = choose_record()
     if name == 'exit':
-        print("Operation canselled")
+        a.viewer("Operation cancelled")
         return "How can I help you?"
 
     while True:
-        print("Type 'N' to edit a name, 'O' skip other details")
+        a.viewer("Type 'N' to edit a name, 'O' skip other details")
         choose = input().lower()
-        if choose =='n':
-            print("Please let me new name: "+name)
+        if choose == 'n':
+            a.viewer("Please let me new name: "+name)
             name_new = input()
             a.data[name_new] = a.data[name]
-            a.data[name_new].name=Name(name_new)
+            a.data[name_new].name = Name(name_new)
             a.data.pop(name)
             name = name_new
-            print("The name succesfully changed")
+            a.viewer("The name successfully changed")
             break 
         if choose == 'o':
-            print("OK, let's go ahead")
+            a.viewer("OK, let's go ahead")
             break
+
     while True:
-        print("Type 'P' to edit phones, 'O' skip to other details")
+        a.viewer("Type 'P' to edit phones, 'O' skip to other details")
         choose = input().lower()
-        if choose =='p':
-            print("Existing phone numbers for the "+name)
+        if choose == 'p':
+            a.viewer("Existing phone numbers for the "+name)
             for ph in a.data[name].phones:
-                print("      "+ph.value)
+                a.viewer("      "+ph.value)
             while True:
-                print("Type 'A' to add  phone, 'E' to edit, 'D' for delete, 'O' skip to other details")
+                a.viewer("Type 'A' to add  phone, 'E' to edit, 'D' for delete, 'O' skip to other details")
                 choose_p = input().lower()
                 if choose_p == 'a':
                      add_phone(name)
                 elif choose_p == 'e':
                     while True:
-                        print("I need the old number to change")
+                        a.viewer("I need the old number to change")
                         phone = choose_phone()
                         if phone == 'exit':
-                            print("Operation canselled")
+                            a.viewer("Operation cancelled")
                             break
                         if phone in [ph.value for ph in a.data[name].phones]:
-                            print("I need the new number to save")
+                            a.viewer("I need the new number to save")
                             phone_new = choose_phone()
                             a.data[name].edit_phone(phone, phone_new)
-                            print ("Phone changed succesfully")
+                            a.viewer("Phone changed successfully")
                         else:
-                            print("This number doesn't belong to the "+name)
+                            a.viewer("This number doesn't belong to the "+name)
                             continue
                         break
                 elif choose_p == 'd':
                     while True:
-                        print("input the number you would like to delete")
+                        a.viewer("Input the number you would like to delete")
                         phone = choose_phone()
                         if phone == 'exit':
-                            print("Operation canselled")
+                            a.viewer("Operation cancelled")
                             break
                         elif phone in [ph.value for ph in a.data[name].phones]:
                             a.data[name].del_phone(phone)
-                            print ("Phone deleted succesfully")
+                            a.viewer("Phone deleted successfully")
                             break
                         else:
-                            print("Number doesn't belong to the "+name+" Try again")
+                            a.viewer("Number doesn't belong to the "+name+". Try again")
                 elif choose_p == 'o':
-                    print("OK, let's go ahead")
+                    a.viewer("OK, let's go ahead")
                     break
                 break
         elif choose == "o":
-            print("OK, let's go ahead")
+            a.viewer("OK, let's go ahead")
             break
+
     while True:
-        print("Type 'E to edit e-mail,  'O' skip to other details")
+        a.viewer("Type 'E to edit e-mail,  'O' skip to other details")
         choose = input().lower()
-        if choose =='e':
-            if type(a.data[name].email)!=type(""):
-                print("Current email for the record "+name+" is:"+a.data[name].email.value) 
+        if choose == 'e':
+            if type(a.data[name].email) != type(""):
+                a.viewer("Current email for the record "+name+" is:"+a.data[name].email.value)
             add_email(name)
             break
         if choose == 'o':
-            print("OK, let's go ahead")
+            a.viewer("OK, let's go ahead")
             break
-    while True:
-        print("Type 'A to edit  address,  'O'  skip to other details")
-        choose = input().lower()
-        if choose =='a':
-            if type(a.data[name].address)!=type(""):
-                print ("Current saved address for record "+name+" is:")
-                for key in record["address"].keys():
-                    print("            "+key+" "*(len("apartment")-len(key))+": "+record["address"][key])
 
+    while True:
+        a.viewer("Type 'A to edit  address,  'O'  skip to other details")
+        choose = input().lower()
+        if choose == 'a':
+            if type(a.data[name].address) != type(""):
+                a.viewer("Current saved address for record "+name+" is:")
+                for key in a.data[name].address.value.keys():
+                    a.viewer("            "+key+" "*(len("apartment")-len(key))+": " + a.data[name].address.value[key])
             add_address(name)
             break
         if choose == 'o':
-            print("OK, let's go ahead")
+            a.viewer("OK, let's go ahead")
             break
     while True:
-        print("Type 'B' to edit birthday, 'F' to finish with contact")
+        a.viewer("Type 'B' to edit birthday, 'F' to finish with contact")
         choose = input().lower()
-        if choose =='b':
-            if type(a.data[name].address)!=type(""):
-                print ("Current birthday for record "+name+" is: "+a.data[name].birthday.value)
+        if choose == 'b':
+            if type(a.data[name].birthday) != type(""):
+                a.viewer("Current birthday for record "+name+" is: "+a.data[name].birthday.value)
             add_birthday(name)
             break
         if choose == 'f':
             break    
-    print("Contact details saved")
-    print(a.data[name])
+    a.viewer("Contact details saved")
+    a.viewer(a.data[name])
     return "How can I help you?"
   
 
 def find_contacts(data):
-    res_lst =[]
-    print("Please input the name, phone or even a part of them")
+    res_lst = []
+    a.viewer("Please input the name, phone or even a part of them")
     search_str = input().rstrip()
     search_str = (
         search_str.strip()
@@ -276,85 +277,86 @@ def find_contacts(data):
             .replace("'\'", "\\")
         
     )
-
     res_lst = a.find(search_str)
     if res_lst == []:
-        print("Couldn't find records in the phone book")
+        a.viewer("Couldn't find records in the phone book")
     else:
-        print("Found next contacts:")
+        a.viewer("Found next contacts:")
         for contact in res_lst:
-            print(a.data[contact])
+            a.viewer(a.data[contact])
     return "How can I help you?"
 
+
 def show_all(data):
-    print("test of show all")    
+    a.viewer("test of show all")
     adress_book = a    
     for page in adress_book:
         for record in page:
-            print(a.data[record["Name"]])
+            a.viewer(a.data[record["Name"]])
         input("Press enter to continue")
     return "How can I help you?"
 
+
 def help_(command):
-    print("List of available features: ")
+    a.viewer("List of available features: ")
     for key in exec_command.keys():
-        print (exec_command[key][1])
-    print ("exit:      Exit program ('good by', 'close' also works)")    
+        a.viewer(exec_command[key][1])
     return "How can I help you?"
 
 
-
 def choose_record():
-    print("Please enter the name of a contact")
+    a.viewer("Please enter the name of a contact")
     while True:
         name = input()
         if name.lower() in [x.lower() for x in a.data.keys()]:
-            for key in   a.data.keys():
+            for key in a.data.keys():
                 if name.lower() == key.lower():
                     name = key
             break
         elif name.lower() == 'exit':
             break
         else:
-            print("Couldn`t find this name in adress book.")
-            print("Here are the list of the contacts with similar spelling:")
+            a.viewer("Couldn't find this name in address book.")
+            a.viewer("Here are the list of the contacts with similar spelling:")
             for c in a.find(name):
-                print("     "+c)
-            print("Please try to choose the name again or type 'Exit' to come back to main menu")    
+                a.viewer("     "+c)
+            a.viewer("Please try to choose the name again or type 'Exit' to come back to main menu")
     return name
 
+
 def choose_phone():
-    print("Please enter the phone number")
+    a.viewer("Please enter the phone number")
     while True:
         phone = input().lower()
         if phone == 'exit':
             break
-        is_correct_format= re.search("\+?[\ \d\-\(\)]+$",phone)
-        phone= sanitize_phone_number(phone)
-        if is_correct_format!=None and len(phone) == 13: 
+        is_correct_format = re.search("\+?[\ \d\-\(\)]+$", phone)
+        phone = sanitize_phone_number(phone)
+        if is_correct_format != None and len(phone) == 13:
             break
         else:
-            print("Phone number is incorrect format, please try again or type 'Exit' to come back to main menu")
+            a.viewer("Phone number is incorrect format, please try again or type 'Exit' to come back to main menu")
     return phone
 
+
 def choose_date():
-    print("Please enter the date of birthday in format dd.mm.yyyy")
+    a.viewer("Please enter the date of birthday in format dd.mm.yyyy")
     while True:
         birthday = input().lower()
-        is_correct_format= re.search("\d{2}[\/\.\:]\d{2}[\/\.\:]\d{4}",birthday)
-        if is_correct_format!=None:
-            birthday = birthday.replace("/",".")
-            birthday = birthday.replace(":",".")
+        is_correct_format = re.search("\d{2}[\/\.\:]\d{2}[\/\.\:]\d{4}", birthday)
+        if is_correct_format != None:
+            birthday = birthday.replace("/", ".")
+            birthday = birthday.replace(":", ".")
             b_array = birthday.split(".")
             try:
                 datetime.strptime(birthday, '%d.%m.%Y').date()
             except ValueError:
-                print("You gave me incorrect date, be carefull nex time")
+                print("You gave me incorrect date, be careful nex time")
             else:
                 break
         elif birthday == 'exit':
             break
-        print("Date has incorrect format, please try again or type 'Exit' to come back to main menu")
+        a.viewer("Date has incorrect format, please try again or type 'Exit' to come back to main menu")
     return birthday
 
 
@@ -363,26 +365,27 @@ def delete_contact(command):
     while True:
         name = choose_record()
         while True:
-            print ("Find a contact "+name+", are you sure to delete it? Please type Y/N?")
+            a.viewer("Find a contact "+name+", are you sure to delete it? Please type Y/N?")
             choose_d = input().lower()
             if choose_d == 'y': 
                 a.delete(name)
-                print("Contact "+name+" deleted")
+                a.viewer("Contact "+name+" deleted")
                 return "How can I help you?"
             elif choose_d == 'n':
-                print("Operation canselled")
+                a.viewer("Operation cancelled")
                 return "How can I help you?"
             else:
-                print("Make a correct choise, please")
-        return  "How can I help you?"         
+                a.viewer("Make a correct choice, please")
+        return "How can I help you?"
 
 ############################# add the note to note book ####################################################
+
 def add_note(command):
     while True:
-        print("Input the text of your note here. Use a hashtags # for key_words. Allowed to use copy/paste to speed up" )
+        a.viewer("Input the text of your note here. Use a hashtags # for key_words. Allowed to use copy/paste to speed up")
         note = Note(input())
-        if len(note.keyword) ==0:
-            print("You forgot to add a keywords, please let me them, using # and separate them by spaces")
+        if len(note.keyword) == 0:
+            a.viewer("You forgot to add a keywords, please let me them, using # and separate them by spaces")
             input_str = input("#Key words: ")
             lst = input_str.split(" ")
             for kw in lst:
@@ -393,45 +396,46 @@ def add_note(command):
     return "How can I help you?"
 
 ############################# edit the note  ####################################################
+
 def edit_note(command):
     while True:
         res_lst=[]
-        print("Input the keywords for the note you would like to edit (You could input a couple of keywords separated by spaces)" )
-        input_str=input()
-        res_lst=n.find(input_str)
-        if res_lst!=[]:
-            print("I found some notes connected to your request:")
+        a.viewer("Input the keywords for the note you would like to edit (You could input a couple of keywords separated by spaces)")
+        input_str = input()
+        res_lst = n.find(input_str)
+        if res_lst != []:
+            a.viewer("I found some notes connected to your request:")
             for result in res_lst:
-                print(result)
+                a.viewer(result)
             break                   
         elif input_str.lower() == 'exit':
-            print("Operation canselled")
+            a.viewer("Operation cancelled")
             return 0
         else:
-            print("Couldn't find notes with specified keywords, try again or type 'exit'")
+            a.viewer("Couldn't find notes with specified keywords, try again or type 'exit'")
             continue       
     while True:
         choose = input("Input ID of note you would like to edit: ")
-        if  choose in [str(x.id) for x in res_lst]:
-            print("Keywords: ",["# "+k for k in n.data[int(choose)].keyword])
-            print("----------------- you could copy here ------------------------")
-            print(n.data[int(choose)].note)    
-            print("------------------ avoid new line character when copy --------")
-            print("You could use copy/paste to speed up. Use # to mark up keywords")
+        if choose in [str(x.id) for x in res_lst]:
+            a.viewer("Keywords: ",["# "+k for k in n.data[int(choose)].keyword])
+            a.viewer("----------------- you could copy here ------------------------")
+            a.viewer(n.data[int(choose)].note)
+            a.viewer("------------------ avoid new line character when copy --------")
+            a.viewer("You could use copy/paste to speed up. Use # to mark up keywords")
             new_text = input()
             note_temp = Note(new_text)
-            print("Please add a keywords for a note, separated by space.")
-            kw_lst=input("Keywords: ").split(" ")
-            print(kw_lst)
+            a.viewer("Please add a keywords for a note, separated by space.")
+            kw_lst = input("Keywords: ").split(" ")
+            a.viewer(kw_lst)
             note_temp.keyword.extend(kw_lst)
             n.data[int(choose)] = note_temp
-            print("Note succesfully changed")
+            a.viewer("Note successfully changed")
             break
         elif choose.lower() == 'exit':
-            print("Operation cancelled")
+            a.viewer("Operation cancelled")
             break
         else:
-            print("Make a correct choice")
+            a.viewer("Make a correct choice")
             continue
         break
 
@@ -439,93 +443,96 @@ def edit_note(command):
     return "How can I help you?"
 
 ############################# delete the note ####################################################
+
 def delete_note(command):
     while True:
-        res_lst=[]
-        print("Input the keyword for the note you would like to delete" )
-        input_str=input("You could input a couple of keywords separated by spaces: ")
+        res_lst = []
+        a.viewer("Input the keyword for the note you would like to delete")
+        input_str = input("You could input a couple of keywords separated by spaces: ")
         res_lst = n.find(input_str)    
-        if len(res_lst)!=0:
-            print("I found some notes connected to your request:")
+        if len(res_lst) != 0:
+            a.viewer("I found some notes connected to your request:")
             for result in res_lst:
-                print(result)
+                a.viewer(result)
             while True:
                 choose = input("Input ID of note you would like to delete: ")
-                if  choose in [str(x.id) for x in res_lst]:
+                if choose in [str(x.id) for x in res_lst]:
                     n.delete(int(choose))
-                    print("Note succesfully deleted")
+                    a.viewer("Note successfully deleted")
                     break
                 elif choose.lower() == 'exit':
-                    print("Operation cancelled")
+                    a.viewer("Operation cancelled")
                     break
                 else:
-                    print("Make a correct choice")
+                    a.viewer("Make a correct choice")
                     continue
             break
 
         elif input_str.lower() == 'exit':
-            print("Operation cancelled")
+            a.viewer("Operation cancelled")
             break
         
         else:
-            print("Couldn't find notes with specified keywords, try again or type 'exit'")
+            a.viewer("Couldn't find notes with specified keywords, try again or type 'exit'")
             continue
     return "How can I help you?"
 
 
 def find_notes(command):
     while True:
-        res_lst=[]
-        print("Input the keyword for the note you would like to find" )
-        input_str=input("Allowed input of multiply keywords separated by spaces: ")
-        res_lst=n.find(input_str)   
-        if len(res_lst)!=0:
-            print("I found some notes connected to your request:")
+        res_lst = []
+        a.viewer("Input the keyword for the note you would like to find")
+        input_str = input("Allowed input of multiply keywords separated by spaces: ")
+        res_lst = n.find(input_str)
+        if len(res_lst) != 0:
+            a.viewer("I found some notes connected to your request:")
             for result in res_lst:
-                print(result)
+                a.viewer(result)
             break
         elif input_str.lower() == 'exit':
-            print("Operation cancelled")
+            a.viewer("Operation cancelled")
             break
         else:
-            print("Couldn't find notes with specified keywords, try again or type 'exit'")
+            a.viewer("Couldn't find notes with specified keywords, try again or type 'exit'")
             continue
     return "How can I help you?"
 
 
-
 ############################# show all the notes ####################################################
+
 def show_notes(command):
     for page in n:
         for record in page:
-            print(record)
+            a.viewer(record)
         input("Press enter to continue")
     return "How can I help you?"
 
 
 ############################# sorting the notes by keywords list ####################################################
+
 def sort_notes(command):
     sort_notebook = Notebook("temp")
     sort_notebook.data = dict(sorted(n.data.items(), key=lambda item: sorted(item[1].keyword, key = lambda x: x.upper())))
     n.data = sort_notebook.data
     for item in n.data.keys():
-        n.data[item].keyword =  sorted(n.data[item].keyword, key = lambda x: x.upper())   
-        print(n.data[item])
-    print("Sorting completed")
+        n.data[item].keyword = sorted(n.data[item].keyword, key = lambda x: x.upper())
+        a.viewer(n.data[item])
+    a.viewer("Sorting completed")
     return "How can I help you?"
 
 
 ############           add code of sorting function here ######################################################
+
 def sort_folder(command):
     while True: 
-        print("Type path to the folder, use '/' to folders")
+        a.viewer("Type path to the folder, use '/' to folders")
         path = Path(input())
         if path.exists(): 
             parse_folder(path)
             break 
         else:
-            print("Path doesn`t exist")    
-    print("Sorting completed")
+            a.viewer("Path doesn't exist")
+    a.viewer("Sorting completed")
     return "How can I help you?"
 
 
@@ -534,55 +541,60 @@ def sort_folder(command):
 def next_birthday(command):
     res_lst = []
     while True:    
-        print("How many days in the period we are looking for")
+        a.viewer("How many days in the period we are looking for")
         days = input()
         try:
             period = int(days)
-            if period >365 or period <=0:
-                print("Incorrect, should be integer between 0 and 365 days")
+            if period > 365 or period <= 0:
+                a.viewer("Incorrect, should be integer between 0 and 365 days")
                 continue
             else:
                 for name in a.data.keys():
-                   if int(a.data[name].days_to_birthday())<period:
+                   if int(a.data[name].days_to_birthday()) < period:
                        res_lst.append(a.data[name])
-                if len(res_lst)>0:
-                    print("List of contacts that have birthday in ", days," days:")
+                if len(res_lst) > 0:
+                    a.viewer("List of contacts that have birthday in ", days, " days:")
                     for res in res_lst:
-                        print("Name ", res.name.value, ", birthday ",str(res.birthday.value))
+                        a.viewer("Name ", res.name.value, ", birthday ", str(res.birthday.value))
                 else:
-                    print("I'm sorry, couldn't find any")
+                    a.viewer("I'm sorry, couldn't find any")
                 break
         except:
-            print("Incorrect input, should be numeric between 0 and 365 days")
+            a.viewer("Incorrect input, should be numeric between 0 and 365 days")
             continue
     return "How can I help you?"
-
 
 
 def save_(data):
     a.dump("Work telephones.json")
     n.dump("Work notes.json")
-    print("All data saved")
+    a.viewer("All data saved")
     return "How can I help you?"
+
+
+def exit_func(data):
+    a.viewer('Good bye!')
+
     
 exec_command = { 
     "hello": [hello_,                  "hello:              Greetings", 0], 
-    "add contact":  [add_contact,      "add contact:        Add a new contact", 2], # adopted to the project needs
-    "edit contact": [edit_contact,     "edit contact:       Edit the contact detail", 2], # adopted to the project needs
-    "find contact": [find_contacts,    "find contact:       Find the records by phone or name", 1], # adopted to the project needs
-    "find notes":   [find_notes,       "find notes:         Find the notes by text or keywords", 1], # adopted to the project needs
-    "show all contacts": [show_all,    "show all contacts:  Print all the records of adress book, page by page", 0], # adopted to the project needs
-    "show all notes":    [show_notes,  "show all notes:     Print all the records of adress book, page by page", 0], # adopted to the project needs
-    "help": [help_,                    "help:               Print a list of the available commands",0],  # adopted to the project needs,
-    "add note": [add_note,             "add note:           Add new text note ", 0],# adopted to the project needs
-    "edit note": [edit_note,           "edit note:          Edit existing text note ", 0],# adopted to the project needs
-    "delete contact": [delete_contact, "delete contact:     Delete contact", 2], # adopted to the project needs,
-    "delete note": [delete_note,       "delete note:        Delete text note", 2], # adopted to the project needs,
-    "sort notes": [sort_notes,         "sort note:          Sort of the notes by keywords", 2], # adopted to the project needs
-    "sort folder": [sort_folder,       "sort folder:        Sort selected folder by file types", 2], # adopted to the project needs
-    "next birthday": [next_birthday,   "next birthday:      Let you the contats with birthdays in specified period", 2], # adopted to the project needs
-    "save": [save_,                    "save:               Save the current state of data to disk", 0]  # adopted to the project needs,
-                           
+    "add contact":  [add_contact,      "add contact:        Add a new contact", 2],
+    "edit contact": [edit_contact,     "edit contact:       Edit the contact detail", 2],
+    "find contact": [find_contacts,    "find contact:       Find the records by phone or name", 1],
+    "find notes":   [find_notes,       "find notes:         Find the notes by text or keywords", 1],
+    "show all contacts": [show_all,    "show all contacts:  Print all the records of adress book, page by page", 0],
+    "show all notes":    [show_notes,  "show all notes:     Print all the records of adress book, page by page", 0],
+    "help": [help_,                    "help:               Print a list of the available commands",0],
+    "add note": [add_note,             "add note:           Add new text note ", 0],
+    "edit note": [edit_note,           "edit note:          Edit existing text note ", 0],
+    "delete contact": [delete_contact, "delete contact:     Delete contact", 2],
+    "delete note": [delete_note,       "delete note:        Delete text note", 2],
+    "sort notes": [sort_notes,         "sort note:          Sort of the notes by keywords", 2],
+    "sort folder": [sort_folder,       "sort folder:        Sort selected folder by file types", 2],
+    "next birthday": [next_birthday,   "next birthday:      Let you the contats with birthdays in specified period", 2],
+    "save": [save_,                    "save:               Save the current state of data to disk", 0],
+    "exit": [exit_func,                "exit:                Exits the program"]
+
              }
 
 
@@ -591,34 +603,37 @@ def handler(command):
         return 'exit'
     else:
         return exec_command[command][0]("")
-          
+
+
+a = AddressBook("Work telephones")
+n = Notebook("Work notes")
+
+
 def listener():
     command = ""
     communication_str = "Hi! Looking for your order!"
     while (communication_str) not in exit_command:
-        print(communication_str)
+        a.viewer(communication_str)
         message = input().lower()
-        a = process.extractne(message, exec_command.keys())
-        command = a[0]
+        leven = process.extractOne(message, exec_command.keys())
+        command = leven[0]
         communication_str = handler(command)
 
-a = AddressBook("Work telephones")
-n = Notebook("Work notes")
 
 def start_bot():
    try:
       a.load("Work telephones.json")
    except:
-      print("Couldn't find file, starting with empty adress book")
+      a.viewer("Couldn't find file, starting with empty address book")
    try:
-      n.load("Work notes.json")    
+      n.load("Work notes.json")
    except:
-      print("Couldn't load file, starting with empty note book")
+      a.viewer("Couldn't load file, starting with empty note book")
    listener() 
    try:
       a.dump("Work telephones.json")
       n.dump("Work notes.json")
    except:
-      print("Couldn't save file, all the changes could be loose")
+      a.viewer("Couldn't save file, all the changes could be loose")
 
 start_bot()
