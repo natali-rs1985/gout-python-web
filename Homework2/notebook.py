@@ -10,12 +10,12 @@ from addressbook import ViewerInterface
 
 class Notebook(UserDict):
 
-    def __init__(self, name):
+    def __init__(self, name, viewer):
         super().__init__()
         self.name = name
         self.current_page = 0
         self.records_on_the_page = 3
-        self.viewer = ViewerInterface().view
+        self.viewer = viewer
 
     def add_note(self, note):
         self.data[note.id] = note
@@ -126,7 +126,3 @@ class Note():
             str_res = str_res+"\n"
             
         return str_res+"-----------------------------------------------------------"
-                        
-                  
- 
-
