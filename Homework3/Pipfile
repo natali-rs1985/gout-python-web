@@ -1,0 +1,13 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fuzzywuzzy = "*"
+python-levenshtein-wheels = {path = "./python_Levenshtein_wheels-0.13.2-cp39-cp39-win_amd64.whl"}
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"
