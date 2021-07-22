@@ -1,2 +1,0 @@
-fuzzywuzzy==0.18.0
-python-Levenshtein-wheels @ file:///C:/My_Project/python_Levenshtein_wheels-0.13.2-cp39-cp39-win_amd64.whl
