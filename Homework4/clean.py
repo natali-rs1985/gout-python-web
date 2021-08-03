@@ -1,15 +1,16 @@
 import time
 import sys
+import os
 import os.path
 from pathlib import Path
-import re
 import shutil
 from concurrent.futures import ThreadPoolExecutor
 import threading
 
+
 IMAGES = ['JPEG', 'PNG', 'JPG']
 VIDEO = ['AVI', 'MP4', 'MOV']
-DOCUMENTS = ['DOC', 'DOCX', 'TXT', 'PDF', 'XLS', 'XLSX']
+DOCUMENTS = ['DOC', 'DOCX', 'TXT', 'PDF', 'XLS', 'XLSX', 'PPTX']
 MUSIC = ['MP3', 'OGG', 'WAV', 'AMR']
 ARCHIVES = ['ZIP', 'GZ', 'TAR']
 FILE_DICT = {'IMAGES': 'images',
@@ -18,112 +19,45 @@ FILE_DICT = {'IMAGES': 'images',
              'MUSIC': 'music',
              'ARCHIVES': 'archives'}
 
-images_list = []
-video_list = []
-documents_list = []
-music_list = []
-archives_list = []
-another = []
 
-extensions = set()
-unknown_extensions = set()
+def find_dirs(in_path):
+    dirs_lst = []
+    for dirpath, dirs, f_files in os.walk(in_path):
+        dirs_lst.append(Path(dirpath))
+    return dirs_lst
 
 
-def normalize(string):
-    dictionary = {
-        ord('а'): 'a',
-        ord('б'): 'b',
-        ord('в'): 'v',
-        ord('г'): 'g',
-        ord('д'): 'd',
-        ord('е'): 'e',
-        ord('ё'): 'yo',
-        ord('ж'): 'zh',
-        ord('з'): 'z',
-        ord('и'): 'i',
-        ord('й'): 'y',
-        ord('к'): 'k',
-        ord('л'): 'l',
-        ord('м'): 'm',
-        ord('н'): 'n',
-        ord('о'): 'o',
-        ord('п'): 'p',
-        ord('р'): 'r',
-        ord('с'): 's',
-        ord('т'): 't',
-        ord('у'): 'u',
-        ord('ф'): 'f',
-        ord('х'): 'h',
-        ord('ц'): 'ts',
-        ord('ч'): 'ch',
-        ord('ш'): 'sh',
-        ord('щ'): 'shch',
-        ord('ъ'): 'y',
-        ord('ы'): 'y',
-        ord('ь'): '',
-        ord('э'): 'e',
-        ord('ю'): 'yu',
-        ord('я'): 'ya',
-
-        ord('А'): 'A',
-        ord('Б'): 'B',
-        ord('В'): 'V',
-        ord('Г'): 'G',
-        ord('Д'): 'D',
-        ord('Е'): 'Ye',
-        ord('Ё'): 'Yo',
-        ord('Ж'): 'Zh',
-        ord('З'): 'Z',
-        ord('И'): 'I',
-        ord('Й'): 'Y',
-        ord('К'): 'K',
-        ord('Л'): 'L',
-        ord('М'): 'M',
-        ord('Н'): 'N',
-        ord('О'): 'O',
-        ord('П'): 'P',
-        ord('Р'): 'R',
-        ord('С'): 'S',
-        ord('Т'): 'T',
-        ord('У'): 'Yu',
-        ord('Ф'): 'F',
-        ord('Х'): 'H',
-        ord('Ц'): 'Ts',
-        ord('Ч'): 'Ch',
-        ord('Ш'): 'Sh',
-        ord('Щ'): 'Shch',
-        ord('Ъ'): 'Y',
-        ord('Ы'): 'Y',
-        ord('Ь'): '',
-        ord('Э'): 'E',
-        ord('Ю'): 'Yu',
-        ord('Я'): 'Ya',
-    }
-    transliterate_string = string.translate(dictionary)
-    normalized_string = re.sub('[\W]', '_', transliterate_string)
-    return normalized_string
-
-
-def find_files(in_path):
+def find_files(dir):
     files = []
-    if in_path.exists():
-        for file in in_path.iterdir():
+    if dir.exists():
+        for file in dir.iterdir():
             if file.is_file():
                 files.append(file)
-            else:
-                files.extend(find_files(file))
+    return files
+
+
+def conc_find_files(in_path):
+    files = list()
+    dirs = find_dirs(in_path)
+
+    with ThreadPoolExecutor(max_workers=12) as executor:
+        future_to_path = list(executor.map(find_files, dirs))
+        print(threading.active_count())
+
+    for x in future_to_path:
+        files.extend(x)
 
     return files
 
 
-def find_dirs(in_path):
+def del_dirs(in_path):
     if in_path.exists():
-        files = len(find_files(in_path))
+        files = len(conc_find_files(in_path))
         object_list = in_path.iterdir()
         if object_list:
             for obj in object_list:
                 if obj.is_dir():
-                    find_dirs(obj)
+                    del_dirs(obj)
         if files == 0:
             in_path.rmdir()
 
@@ -141,13 +75,13 @@ def check_dir(path, file_type):
 
 
 def unpack_archive(path, file_obj, file_name, file_type):
-    unpack_path = os.path.join(path, file_type, normalize(file_name))
+    unpack_path = os.path.join(path, file_type, file_name)
     try:
         shutil.unpack_archive(file_obj.absolute(), unpack_path)
         for file in find_files(Path(unpack_path)):
             new_file_name, new_file_ext = get_file_attrs(file.name)
             new_path = os.path.join(unpack_path, ".".join(
-                [normalize(new_file_name), new_file_ext]))
+                [new_file_name, new_file_ext]))
             shutil.move(file.absolute(), new_path)
         file_obj.unlink()
     except shutil.ReadError:
@@ -160,7 +94,7 @@ def move_file(path, file_obj, file_name, file_ext, file_type):
         unpack_archive(path, file_obj, file_name, file_type)
     else:
         new_path = os.path.join(path, file_type, ".".join(
-            [normalize(file_name), file_ext]))
+            [file_name, file_ext]))
         shutil.move(file_obj.absolute(), new_path)
 
 
@@ -185,7 +119,7 @@ def sort_by_extension(path, file):
 def main():
     path = sys.argv[1]
     path = Path(path)
-    files = find_files(Path(path))
+    files = conc_find_files(path)
     path_list = [path] * len(files)
     if files:
         with ThreadPoolExecutor() as executor:
@@ -193,7 +127,7 @@ def main():
             print(threading.active_count())
     else:
         print('Path does not exist')
-    find_dirs(path)
+    del_dirs(path)
 
 
 if __name__ == '__main__':
