@@ -1,4 +1,5 @@
 from multiprocessing import Pool
+from concurrent.futures import ProcessPoolExecutor
 import time
 
 
@@ -14,8 +15,12 @@ def factorize(number):
 
 def main():
     numbers = [128, 255, 99999, 10651060]
-    with Pool(processes=2) as pool:
-        results = pool.map(factorize, numbers)
+    # with Pool(processes=2) as pool:
+    #     results = pool.map(factorize, numbers)
+    # a, b, c, d = results
+
+    with ProcessPoolExecutor(max_workers=2) as executor:
+        results = executor.map(factorize, numbers)
     a, b, c, d = results
 
     # a = factorize(128)
