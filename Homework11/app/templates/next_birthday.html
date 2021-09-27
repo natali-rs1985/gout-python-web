@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<h1>Find contacts with birthday</h1>
+<div>
+    <form action="{{ url_for('next_birthday') }}" method="post">
+        <label for="days">Input number of days (1-365)</label>
+        <input
+                type="number"
+                class="form-control"
+                id="days"
+                name="days"
+                min="1"
+                max="365"
+                value="{{ request.form['name'] }}"
+                required
+        />
+        <button type="button submit">
+            FIND
+        </button>
+    </form>
+</div>
+<br>
+
+{% if res_lst %}
+    <div>
+        <span><h2>List of contacts that have birthday in *{{ days }}* days:</h2></span>
+        <br>
+        {% for res in res_lst %}
+            <ul><li>
+                <span><h3>Name: {{ res.name }}....... birthday: {{ res.birthday }}</h3></span>
+            </li></ul>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% endblock %}

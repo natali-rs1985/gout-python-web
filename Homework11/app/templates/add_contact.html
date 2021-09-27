@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <form action="{{ url_for('add_contact') }}" method="post">
+    <h1>Add new contact</h1>
+    <label for="name">Name</label>
+    <input name="name" id="name" min="1" required>
+    <label for="phones">Phone</label>
+    <input name="phones" id="phones">
+    <label for="email">Email</label>
+    <input name="email" id="email">
+     <label for="address">Address</label>
+    <input name="address" id="address">
+      <label for="birthday">Birthday</label>
+    <input name="birthday" id="birthday">    <input type="submit" value="Add contact">
+  </form>
+
+{% if rec %}
+
+    <div>
+        <span><h2>Contact *{{ rec.name }}* was added to Contact Book</h2></span>
+        <br>
+        <span><h3>Name: {{ rec.name }}</h3></span>
+        {% if rec.phones %}
+            <span><h3>Phones: {{ rec.phones }}</h3></span>
+        {% endif %}
+        {% if rec.email %}
+            <span><h3>Email: {{ rec.email }}</h3></span>
+        {% endif %}
+        {% if rec.address %}
+            <span><h3>Address: {{ rec.address }}</h3></span>
+        {% endif %}
+        {% if rec.birthday %}
+            <span><h3>Birthday: {{ rec.birthday }}</h3></span>
+        {% endif %}
+    </div>
+
+{% endif %}
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<br>
+<h1>Delete contact</h1>
+<div>
+    <form action="{{ url_for('delete_contact') }}" method="post">
+        <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                min="1"
+                placeholder="Input name of contact"
+                value="{{ request.form['name'] }}"
+                required
+        />
+        <button
+                type="button submit"
+        >
+            DELETE
+        </button>
+    </form>
+</div>
+<br>
+
+{% if res %}
+    <span><h2>Contact *{{ res.name }}* was deleted!</h2></span>
+{% endif %}
+
+{% endblock %}

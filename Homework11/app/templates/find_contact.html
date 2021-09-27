@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<br>
+<h1>Find contact</h1>
+<div class="">
+    <form action="{{ url_for('find_contact') }}" method="post">
+        <label for="name">Input name of contact</label>
+        <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                minlength="1"
+                value="{{ request.form['name'] }}"
+                required
+        />
+        <button
+                type="button submit"
+        >
+            FIND
+        </button>
+    </form>
+</div>
+<br>
+
+{% if res %}
+    <div><span><h2>Name: {{ res.name }}</h2></span>
+        {% if res.phones %}
+            <span><h3>Phones: {{ res.phones }}</h3></span>
+        {% endif %}
+        {% if res.email %}
+            <span><h3>Email: {{ res.email }}</h3></span>
+        {% endif %}
+        {% if res.address %}
+            <span><h3>Address: {{ res.address }}</h3></span>
+        {% endif %}
+        {% if res.birthday %}
+            <span><h3>Birthday: {{ res.birthday }}</h3></span>
+        {% endif %}
+    </div>
+
+{% endif %}
+{% endblock %}

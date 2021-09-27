@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>{% block title %}{% endblock %} - Personal APP</title>
+</head>
+
+<body>
+    <div>Contacts Book:
+        <button><a href="{{ url_for('home') }}">HOME</a></button>
+        <button><a href="{{ url_for('show_all') }}">SHOW ALL</a></button>
+        <button><a href="{{ url_for('add_contact') }}">ADD</a></button>
+        <button><a href="{{ url_for('find_contact') }}">FIND</a></button>
+        <button><a href="{{ url_for('delete_contact') }}">DELETE</a></button>
+        <button><a href="{{ url_for('edit_contact') }}">EDIT</a></button>
+        <button><a href="{{ url_for('next_birthday') }}">BIRTHDAY</a></button>
+    </div>
+      <hr>
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      <ul>
+          {% for message in messages %}
+          <li>{{ message }}</li>
+          {% endfor %}
+      </ul>
+      {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+</body>

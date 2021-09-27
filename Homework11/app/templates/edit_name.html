@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<h1>Edit Name</h1>
+<div class="">
+    <form action="{{ url_for('edit_name') }}" method="post">
+        <label for="name">Input new name for contact</label>
+        <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                minlength="1"
+                value="{{ request.form['name'] }}"
+                required
+        />
+        <button
+                type="button submit"
+        >
+            EDIT
+        </button>
+    </form>
+</div>
+<br>
+
+{% if res %}
+
+    <span><h2>Contact name was changed to *{{ res.name }}*</h2></span>
+    <br>
+
+    <div>
+        <span><h2>Name: {{ res.name }}</h2></span>
+        {% if res.phones %}
+            <span><h3>Phones: {{ res.phones }}</h3></span>
+        {% endif %}
+        {% if res.email %}
+            <span><h3>Email: {{ res.email }}</h3></span>
+        {% endif %}
+        {% if res.address %}
+            <span><h3>Address: {{ res.address }}</h3></span>
+        {% endif %}
+        {% if res.birthday %}
+            <span><h3>Birthday: {{ res.birthday }}</h3></span>
+        {% endif %}
+    </div>
+    <br>
+
+    <h2>Choose what do you want to edit</h2>
+    <div>
+        <button><a href="{{ url_for('edit_name') }}">NAME</a></button>
+        <button><a href="{{ url_for('edit_phone') }}">PHONE</a></button>
+        <button><a href="{{ url_for('edit_email') }}">EMAIL</a></button>
+        <button><a href="{{ url_for('edit_address') }}">ADDRESS</a></button>
+        <button><a href="{{ url_for('edit_birthday') }}">BIRTHDAY</a></button>
+    </div>
+{% endif %}
+
+{% endblock %}

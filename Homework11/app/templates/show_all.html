@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>All contacts in Contact Book</h1>
+    <span><h4>############################################################</h4></span>
+    <br>
+
+    {% for users in users %}
+    <div><span><h2>Name: {{ users.name }}</h2></span>
+        {% if users.phones %}
+            <span><h3>Phones: {{ users.phones }}</h3></span>
+        {% endif %}
+        {% if users.email %}
+            <span><h3>Email: {{ users.email }}</h3></span>
+        {% endif %}
+        {% if users.address %}
+            <span><h3>Address: {{ users.address }}</h3></span>
+        {% endif %}
+        {% if users.birthday %}
+            <span><h3>Birthday: {{ users.birthday }}</h3></span>
+        {% endif %}
+        <span><h3>------------------------------------------------------</h3></span>
+        <br>
+    </div>
+    {% endfor %}
+{% endblock %}

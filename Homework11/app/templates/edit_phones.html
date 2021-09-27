@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<h1>Edit Phones</h1>
+
+<div>
+{% if cont.phones %}
+    {% for phone in cont.phones %}
+        <span><li>{{ phone }}
+        <form action="{{ url_for('delete_phone', phone=phone) }}" method=post>
+            <input class="btn" type="submit" name="delete" value="Delete">
+        </form></span><br>
+    {% endfor %}
+{% endif %}
+</div>
+<br>
+
+<div class="">
+    <form action="{{ url_for('edit_phone') }}" method="post">
+        <label for="phone">Input new phone for contact</label>
+        <input
+                type="text"
+                class="form-control"
+                id="phone"
+                name="phone"
+                value="{{ request.form['name'] }}"
+                required
+        />
+        <button
+                type="button submit"
+        >
+            ADD PHONE
+        </button>
+    </form>
+</div>
+<br>
+
+    <br>
+
+    <h2>Choose what do you want to edit</h2>
+    <div>
+        <button><a href="{{ url_for('edit_name') }}">NAME</a></button>
+        <button><a href="{{ url_for('edit_phone') }}">PHONE</a></button>
+        <button><a href="{{ url_for('edit_email') }}">EMAIL</a></button>
+        <button><a href="{{ url_for('edit_address') }}">ADDRESS</a></button>
+        <button><a href="{{ url_for('edit_birthday') }}">BIRTHDAY</a></button>
+    </div>
+
+{% endblock %}
