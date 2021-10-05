@@ -2,33 +2,51 @@ import aiohttp_jinja2
 import aiohttp
 import asyncio
 from .urls import url_1, url_3, url_2
+from datetime import datetime
+from bs4 import BeautifulSoup
 
 
 async def find_weather_1(session, url):
-   async with session.get(url, headers={'Accept': 'application/json', }) as response:
-      html = await response.json()
-      temp = html['temperature']
-      speed = html['wind']
-      description = html['description']
-      return temp, speed, description
+   async with session.get(url) as response:
+      html = await response.text()
+      soup = BeautifulSoup(html, "html.parser")
+      inf = soup.find('div', {'class': "forecast_frame forecast_now"})
+
+      temp = inf.find('span', {'class': "js_value tab-weather__value_l"}).text.strip()
+      wind = inf.find('div', {'class': "nowinfo__value"}).text.strip()
+      desc = inf.find('span', {'class': "tip _top _center"}).text
+
+      return temp, wind, desc
 
 
 async def find_weather_2(session, url):
-   async with session.get(url, headers={'Accept': 'application/json', }) as response:
-      html = await response.json()
-      temp = str(float("{0:.1f}".format(html['consolidated_weather'][0]['the_temp'])))
-      speed = str(float("{0:.1f}".format(html['consolidated_weather'][0]['wind_speed'])))
-      description = html['consolidated_weather'][0]['weather_state_name']
-      return temp, speed, description
+   now = datetime.now().date()
+   date = str(now)
+   async with session.get(url + date) as response:
+      html = await response.text()
+      soup = BeautifulSoup(html, "html.parser")
+
+      inf = soup.find('div', {'class': "tabsContent"})
+
+      temp = inf.find('p', {'class': "today-temp"}).text.strip()
+      wind = inf.find('div', {'class': "Tooltip wind wind-E"}).text.strip()
+      desc = inf.find('div', {'class': "weatherIco d000"})['title']
+
+      return temp, wind, desc
 
 
 async def find_weather_3(session, url):
    async with session.get(url) as response:
       html = await response.text()
-      temp = html.split('\x1b')[5].split('m')[1]
-      speed = html.split('\x1b')[14].split('m')[1]
-      description = html.split('\x1b')[2].split('m ')[1]
-      return temp, speed, description
+      soup = BeautifulSoup(html, "html.parser")
+      inf = soup.find('body')
+
+      temp = inf.find('span', {'class': "CurrentConditions--tempValue--3a50n"}).text.strip()
+      wind = inf.find('span', {'class': "Wind--windWrapper--3aqXJ undefined"}).text.split('on')[1].split(' ')[0]
+      wind = round((int(wind) / 3.6),1)
+      desc = inf.find('div', {'class': "CurrentConditions--phraseValue--2Z18W"}).text
+
+      return temp, wind, desc
 
 
 async def start_async():
