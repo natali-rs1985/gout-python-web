@@ -19,12 +19,9 @@ class QuotesSpyderPipeline(object):
     def process_item(self, item, spider):
         session = self.Session()
         quotedb = QuoteDB(quote=item["quote"])
-        print(quotedb.quote, '-----------------------------------------------------')
         authordb = AuthorDB()
         authordb.name = item["author"]
-
         exist_author = session.query(AuthorDB).filter_by(name=item["author"]).first()
-        # print(exist_author, '-----------------------------------------')
         if exist_author:
             quotedb.author = exist_author
         else:

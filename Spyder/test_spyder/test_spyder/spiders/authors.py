@@ -16,18 +16,14 @@ class QuotesSpider(scrapy.Spider):
             loader.add_xpath('quote', ".//span[@class='text']/text()")
             author_url = self.start_urls[0] + quote.xpath("span[2]/a/@href").get()
             loader.add_value('author_url', author_url)
-
             quote_item = loader.load_item()
-            yield response.follow(author_url, callback=self.parse_author, meta={'quote_item': quote_item})
+            yield response.follow(author_url, callback=self.parse_author, meta={'quote_item': quote_item}, dont_filter=True)
 
         next_link = response.xpath("//li[@class='next']/a/@href").get()
         if next_link:
             yield scrapy.Request(url=self.start_urls[0] + next_link)
 
     def parse_author(self, response):
-        # print('-------------------------------------------------------------------')
-        # print(response.text)
-
         quote_item = response.meta['quote_item']
         loader = ItemLoader(item=quote_item, response=response)
         loader.add_xpath('author', ".//h3/text()")
