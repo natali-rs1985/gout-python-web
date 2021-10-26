@@ -6,7 +6,7 @@ from pydantic import BaseModel, AnyHttpUrl
 class NewsBase(BaseModel):
 
     news: str
-    url: AnyHttpUrl
+    url: str
     time: str
     sport: str
 
