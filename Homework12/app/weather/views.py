@@ -4,6 +4,7 @@ import asyncio
 from .urls import url_1, url_3, url_2
 from datetime import datetime
 from bs4 import BeautifulSoup
+import re
 
 
 async def find_weather_1(session, url):
@@ -29,8 +30,8 @@ async def find_weather_2(session, url):
       inf = soup.find('div', {'class': "tabsContent"})
 
       temp = inf.find('p', {'class': "today-temp"}).text.strip()
-      wind = inf.find('div', {'class': "Tooltip wind wind-E"}).text.strip()
-      desc = inf.find('div', {'class': "weatherIco d000"})['title']
+      wind = inf.find('div', {'class': "Tooltip wind wind-N"}).text.strip()
+      desc = inf.find('div', {'class': re.compile("weatherIco")})['title']
 
       return temp, wind, desc
 
